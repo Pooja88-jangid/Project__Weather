@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #7876a1;
+            color: #333;
+            text-align: center;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #0a8c55;
+            color: white;
+            width: 100%;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 18px;
+        }
+
+        /* Weather Display Section */
+        .weather {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-top: 40px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .weather-info {
+            margin-bottom: 20px;
+        }
+
+        .weather-info h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .temperature {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .condition {
+            font-size: 20px;
+            color: #7f8c8d;
+        }
+
+        /* Search Section */
+        .search-bar {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-bar button {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #0e5ecf;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #8c3b9e;
+        }
+
+        /* Footer Styles */
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        footer p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <h1>Weather Forecast</h1>
+        <p>Get real-time weather updates</p>
+    </header>
+
+    <!-- Search Bar Section -->
+    <div class="search-bar">
+        <input type="text" id="city" placeholder="Enter city" />
+        <button id="searchBtn">Search</button>
+    </div>
+
+    <!-- Weather Display Section -->
+    <section class="weather">
+        <div class="weather-info">
+            <h2 id="location">Loading...</h2>
+            <div class="temperature">
+                <h1 id="temperature">--°C</h1>
+            </div>
+            <p id="condition" class="condition">Fetching data...</p>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 Weather App. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const apiKey = '2d1cea8aa2151b935b644b9c597dd3bf';  
+        const searchBtn = document.getElementById('searchBtn');
+        const cityInput = document.getElementById('city');
+        
+        // Event listener for search button
+        searchBtn.addEventListener('click', () => {
+            const city = cityInput.value.trim();
+            if (city) {
+                fetchWeather(city);
+            } else {
+                alert('Please enter a city name');
+            }
+        });
+
+        // Fetch weather data from OpenWeatherMap API
+        function fetchWeather(city) {
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+            fetch(weatherUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // If data is not found (wrong city name)
+                    if (data.cod === "404") {
+                        alert("City not found!");
+                        document.getElementById('location').textContent = "Error";
+                        document.getElementById('temperature').textContent = "--°C";
+                        document.getElementById('condition').textContent = "City not found";
+                    } else {
+                        // Extract weather data
+                        const location = data.name;
+                        const temperature = Math.round(data.main.temp);  // Round to nearest integer
+                        const condition = data.weather[0].description;
+
+                        // Update the HTML with the fetched data
+                        document.getElementById('location').textContent = location;
+                        document.getElementById('temperature').textContent = `${temperature}°C`;
+                        document.getElementById('condition').textContent = condition.charAt(0).toUpperCase() + condition.slice(1);
+                    }
+                })
+                .catch(error => {
+                    console.log('Error fetching weather data:', error);
+                    document.getElementById('location').textContent = 'Error';
+                    document.getElementById('temperature').textContent = '--°C';
+                    document.getElementById('condition').textContent = 'Unable to fetch data';
+                });
+        }
+    </script>
+
+</body>
+</html>
